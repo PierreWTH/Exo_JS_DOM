@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>document</title>
+</head>
+    <body>
+
+        <div id="board"></div>
+        <script>
+
+            // ALGO POUR MELANGER LES BOITES
+
+            function shuffleChildren(parent)
+            {
+                let children = parent.children
+                let i = children.length, k, temp
+                    while(--i > 0)
+                    {
+                    // On boucle tant que 1 oté de i est toujours positif}
+                    // k stocke un nombre aléatoire basé sur i 
+                        k = Math.floor(Math.random()*(i+1))
+                    // temp pointe temporairement l'élément a la position k dans board
+                        temp = children[k]
+                    // remplace l'élément a la position k par l'élément a la position i 
+                        children[k] = children[i]
+                    // Place l'élement k pointé temporaireement a la fin du contenu
+                        parent.appendChild(temp)
+                    }
+            }
+
+            // REACTION EN FONCTION DU CLIC SUR LA BOITE
+
+            function showReaction(type, clickedBox)
+            {
+                clickedBox.classList.add(type)
+                if (type !== "success")
+                {
+                    setTimeout(function()
+                    {
+                        clickedBox.classList.remove(type)
+                    }, 800)   
+                }
+            }
+
+            //On crée un nouvel objet HTMLElement grace a createElement et on la met dans une constante. On lui ajoute ensuite la calsse box(méthode add de classlist.) 
+            const box = document.createElement("div")
+            box.classList.add("box")
+
+            // On fais une place dans le DOM tree en le mettant en enfant de la div board avec appenChild()
+            const board = document.querySelector("#board")
+           
+            //Déclaration du numéro de box attendu, s'incrémente quand on clique sur une box valide.
+            let nb = 1
+            
+            // Boucle pour creer 10 boites. On creer une nouvelle variable let newbox qui a pour valeur un clone de l'élément box grace a la méthode cloneNode()
+            for(let i = 1; i <=10; i++){
+                let newbox = box.cloneNode()
+                newbox.innerText = i    
+                board.appendChild(newbox)
+
+                // Association de l'évenement click aux boites du jeu. Placé dans la boucle pour adjoindre l'evenement a toutes les boites
+                newbox.addEventListener("click", function(){
+                    // On verifie si la boite sur laquelle on clique corresponds bien a nb
+                    if (i == nb)
+                    {
+                        //Si c'est le cas on ajoute la classe box valid a notre case
+                        newbox.classList.add("box-valid")
+                        if (nb == board.children.length)
+                        {
+                            board.querySelectorAll(".box").forEach(function(box){
+                                showReaction("success", box)
+                            })
+                        }
+                        // On incrémente i 
+                        nb++
+                    }
+                    // Si box cliquée est supérieure a celle attendue
+                    else if (i > nb)
+                    {
+
+                        showReaction("error", newbox)
+                        nb = 1
+                        // Suppression de la class box valid sur toutes les cases quand le jeu redemarre. 
+                        board.querySelectorAll(".box-valid").forEach(function(validBox){
+                            validBox.classList.remove("box-valid")
+                        })
+                    }
+
+                    //Si case déja cliquée
+                    else 
+                    {
+                        showReaction("notice", newbox)
+                    }
+                        
+                    
+                    
+                })
+            }
+
+            shuffleChildren(board)
+
+        </script>
+    
+    </body>
+</html>
